@@ -30,7 +30,7 @@ cal.grid(row=0, column=1)
 absents = {} # { "<Class>" : [Dates], etc. }
 
 # ----- Label Status -----
-class_status = tk.Label(root, text="", fg="white")
+class_status = tk.Label(root, text="", bg="grey", fg="white", width=30, height=10, wraplength=100)
 class_status.grid(row=1, column=0)
 
 # ----- Functions -----
@@ -52,10 +52,10 @@ def show_absents():
 
 # ----- Buttons -----
 add_absent_button = tk.Button(root, text="Add Absent", command=add_absent, pady=10)
-add_absent_button.grid(row=2, column=1)
+add_absent_button.grid(row=1, column=1)
 
 show_absents_button = tk.Button(root, text="Show Empty Desks", command=show_absents, pady=10)
-show_absents_button.grid(row=3, column=1)
+show_absents_button.grid(row=2, column=1)
 
 
 
