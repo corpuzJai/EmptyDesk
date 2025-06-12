@@ -1,6 +1,5 @@
 import tkinter as tk
-from tkinter import ttk
-from tkcalendar import Calendar, DateEntry
+from tkcalendar import Calendar
 
 root = tk.Tk()
 root.geometry("580x400") # Set window size
@@ -93,7 +92,6 @@ show_absents_button.grid(row=2, column=1)
 
 show_report_button = tk.Button(root, text = "All Empty Desks", command=show_all_absents, pady=10)
 show_report_button.grid(row=3, column=1)
-
 
 root.focus_force()
 root.lift()
