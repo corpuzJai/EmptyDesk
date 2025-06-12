@@ -84,7 +84,6 @@ def show_all_absents():
     report_text.insert(tk.END, f"{'TOTAL CUTS':<25}{total_absents:<15}\n")
     report_text.config(state="disabled")
 
-
 # ----- Buttons -----
 add_absent_button = tk.Button(root, text="Add Absent", command=add_absent, pady=10)
 add_absent_button.grid(row=1, column=1)
@@ -94,10 +93,6 @@ show_absents_button.grid(row=2, column=1)
 
 show_report_button = tk.Button(root, text = "All Empty Desks", command=show_all_absents, pady=10)
 show_report_button.grid(row=3, column=1)
-
-
-
-
 
 
 root.focus_force()
