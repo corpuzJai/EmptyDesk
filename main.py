@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import messagebox, ttk
 from tkcalendar import Calendar
 
 root = tk.Tk()
@@ -18,20 +18,16 @@ root.title("Empty Desk") # Set window title
 # ]
 classes = []
 selected_class = tk.StringVar()
+menu_options = classes if classes else["No classes,raahh"]
+class_dropdown = tk.OptionMenu(root, selected_class, *menu_options)
+class_dropdown.grid(row=0, column=0, padx=5)
 if not classes:
     selected_class.set("No Classes, add one now!")
-else:
-    selected_class.set(classes[0])
-
-menu_options = classes if classes else["No classes"]
-class_dropdown = tk.OptionMenu(root, selected_class, *menu_options)
-
-if not classes:
     class_dropdown.config(state="disabled")
 else:
     class_dropdown.config(state="normal")
+    selected_class.set(classes[0])
 
-class_dropdown.grid(row=0, column=0)
 # ----- Calendar -----
 cal = Calendar(root, font="Helvetica 14", selectmode='day', year=2025, month=8)
 cal.grid(row=0, column=1)
@@ -56,6 +52,7 @@ def add_course_window():
             tk.messagebox.showerror("Invalid Input", "Please class name and valid number")
             return
 
+        classes.append(course)
         absents[course] = {
             "dates": [],
             "limit": int(limit),
@@ -65,8 +62,8 @@ def add_course_window():
         }
 
         messagebox.showinfo("Sucess!", f"Class '{course}' added.")
-        add_course_window.destroy()
         update_class_dropdown()
+        add_course_window.destroy()
 
     add_course_window = tk.Toplevel(root)
     add_course_window.title("Add New Class")
@@ -108,8 +105,15 @@ def remove_course_window():
 def update_class_dropdown():
     menu = class_dropdown["menu"]
     menu.delete(0, "end")
-    for class_name in absents:
-        menu.add_command(label=class_name, command=lambda value=class_name: selected_class.set(value))
+
+    if not classes:
+        selected_class.set("No Classes")
+        class_dropdown.config(state="disabled")
+    else:
+        for class_name in classes:
+            menu.add_command(label=class_name, command=tk._setit(selected_class, class_name))
+        selected_class.set(classes[0])
+        class_dropdown.config(state="normal")
 
 def add_absent():
     class_name = selected_class.get()
@@ -117,15 +121,16 @@ def add_absent():
     absents.setdefault(class_name, [])
 
     if date not in absents[class_name]:
-        absents[class_name].append(date)
+        absents[class_name]['dates'].append(date)
         class_status.config(text=f"Absent on {date} to {class_name}", fg="white")
     else:
         class_status.config(text=f"{date} already marked as Absent in {class_name}", fg="orange")
 
 def show_absents():
     class_name = selected_class.get()
-    empty_desk = absents.get(class_name, [])
-    class_status.config(text=f"{class_name} has {len(empty_desk)} cut(s): {', '.join(empty_desk)}", fg="light blue")
+    class_data = absents.get(class_name, [])
+    dates = class_data.get("dates", [])
+    class_status.config(text=f"{class_name} has {len(dates)} cut(s): {', '.join(dates)}", fg="light blue")
 
 def show_all_absents():
     report_window = tk.Toplevel(root)
@@ -140,14 +145,14 @@ def show_all_absents():
 
     total_absents = 0
 
-    for class_name in absents:
-        dates = absents.get(class_name, [])
-        total_empty_desks = len(dates)
-        total_absents += total_empty_desks
+    for class_name, data in absents.items():
+        dates = data.get("dates", [])
+        count_empty_desks = len(dates)
+        total_absents += count_empty_desks
         
         report_text.insert(
             tk.END,
-            f"{class_name:<25}{total_empty_desks:<15}\n"
+            f"{class_name:<25}{count_empty_desks:<15}\n"
         )
 
         if dates:
