@@ -25,8 +25,13 @@ else:
 
 menu_options = classes if classes else["No classes"]
 class_dropdown = tk.OptionMenu(root, selected_class, *menu_options)
-class_dropdown.grid(row=0, column=0)
 
+if not classes:
+    class_dropdown.config(state="disabled")
+else:
+    class_dropdown.config(state="normal")
+
+class_dropdown.grid(row=0, column=0)
 # ----- Calendar -----
 cal = Calendar(root, font="Helvetica 14", selectmode='day', year=2025, month=8)
 cal.grid(row=0, column=1)
