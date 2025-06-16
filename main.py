@@ -7,20 +7,13 @@ root.geometry("580x400") # Set window size
 root.title("Empty Desk") # Set window title
 
 # ----- Class Dropdown -----
-# classes = [
-#     "CSCI 199.2",
-#     "CSCI 60",
-#     "CSCI 70",
-#     "CSCI 41",
-#     "CSCI 50i",
-#     "DLQ 10",
-#     "ISCS 30.XX"
-# ]
 classes = []
 selected_class = tk.StringVar()
 menu_options = classes if classes else["No classes,raahh"]
 class_dropdown = tk.OptionMenu(root, selected_class, *menu_options)
 class_dropdown.grid(row=0, column=0, padx=5)
+
+# Disables dropdown if there are no classes available
 if not classes:
     selected_class.set("No Classes, add one now!")
     class_dropdown.config(state="disabled")
@@ -118,10 +111,39 @@ def update_class_dropdown():
 def add_absent():
     class_name = selected_class.get()
     date = cal.get_date()
-    absents.setdefault(class_name, [])
+    #absents.setdefault(class_name, [])
 
-    if date not in absents[class_name]:
-        absents[class_name]['dates'].append(date)
+    # Make sure the class exists
+    if class_name not in absents:
+        class_status.config(text="No valid class selected.", fg="red")
+        return
+
+    class_data = absents[class_name]
+    if date not in class_data["dates"]:
+        class_data['dates'].append(date)
+        total_cuts=len(class_data["dates"])
+        limit = class_data["limit"]
+
+        # Shows near limit warning
+        warning_threshold = limit - 1 if limit <=3 else limit - 2
+
+        if total_cuts == warning_threshold:
+            messagebox.showwarning(
+                "Warning",
+                f"You are nearing the cut limit for {class_name}! ({total_cuts}/{limit} cuts)"
+            )
+        elif total_cuts >= limit:
+            messagebox.showerror(
+                "Withdrawn",
+                f"You have exceeded the cut limit for {class_name}.\n This class will now be removed."
+            )
+            absents.pop(class_name, None)
+            if class_name in classes:
+                classes.remove(class_name)
+            update_class_dropdown()
+            class_status.config(text=f"{class_name} removed due to excessive cuts.", fg="red")
+            return
+
         class_status.config(text=f"Absent on {date} to {class_name}", fg="white")
     else:
         class_status.config(text=f"{date} already marked as Absent in {class_name}", fg="orange")
