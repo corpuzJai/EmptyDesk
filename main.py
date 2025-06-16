@@ -8,6 +8,7 @@ root.title("Empty Desk") # Set window title
 
 # ----- Class Dropdown -----
 classes = []
+classes = []
 selected_class = tk.StringVar()
 menu_options = classes if classes else["No classes,raahh"]
 class_dropdown = tk.OptionMenu(root, selected_class, *menu_options)
@@ -154,39 +155,78 @@ def show_absents():
     dates = class_data.get("dates", [])
     class_status.config(text=f"{class_name} has {len(dates)} cut(s): {', '.join(dates)}", fg="light blue")
 
-def show_all_absents():
-    report_window = tk.Toplevel(root)
-    report_window.title("All Empty Desks")
-    report_window.geometry("300x200")
+# def show_all_absents():
+#     report_window = tk.Toplevel(root)
+#     report_window.title("All Empty Desks")
+#     report_window.geometry("300x200")
 
-    report_text = tk.Text(report_window)
-    report_text.pack(pady=10)
+#     report_text = tk.Text(report_window)
+#     report_text.pack(pady=10)
 
-    report_text.insert(tk.END, f"{'Class':<25}{'Empty Desks':<15}\n")
-    report_text.insert(tk.END, "-" *38 + "\n")
+#     report_text.insert(tk.END, f"{'Class':<25}{'Empty Desks':<15}\n")
+#     report_text.insert(tk.END, "-" *38 + "\n")
 
-    total_absents = 0
+#     total_absents = 0
 
-    for class_name, data in absents.items():
-        dates = data.get("dates", [])
-        count_empty_desks = len(dates)
-        total_absents += count_empty_desks
+#     for class_name, data in absents.items():
+#         dates = data.get("dates", [])
+#         count_empty_desks = len(dates)
+#         total_absents += count_empty_desks
         
-        report_text.insert(
-            tk.END,
-            f"{class_name:<25}{count_empty_desks:<15}\n"
-        )
+#         report_text.insert(
+#             tk.END,
+#             f"{class_name:<25}{count_empty_desks:<15}\n"
+#         )
 
-        if dates:
-            for date in dates:
-                report_text.insert(tk.END, f"  - {date}\n")
-        else:
-            report_text.insert(tk.END, "  - Full Desks\n")
+#         if dates:
+#             for date in dates:
+#                 report_text.insert(tk.END, f"  - {date}\n")
+#         else:
+#             report_text.insert(tk.END, "  - Full Desks\n")
         
-        report_text.insert(tk.END, "\n")
+#         report_text.insert(tk.END, "\n")
     
-    report_text.insert(tk.END, f"{'TOTAL CUTS':<25}{total_absents:<15}\n")
-    report_text.config(state="disabled")
+#     report_text.insert(tk.END, f"{'TOTAL CUTS':<25}{total_absents:<15}\n")
+#     report_text.config(state="disabled")
+
+def show_class_details():
+    class_report_window = tk.Toplevel(root)
+    class_report_window.title("Class Details")
+    class_report_window.geometry("500x400")
+
+    class_report_text = tk.Text(class_report_window, wrap="word", padx=10, pady=10)
+    class_report_text.pack(fill="both", expand=True)
+
+    if not absents:
+        class_report_text.insert(tk.END, "No classes available.\n")
+    else:
+        for class_name, info in absents.items():
+            prof = info.get("prof", "N/A")
+            email = info.get("email", "N/A")
+            room = info.get("room", "N/A")
+            limit = info.get("limit", "N/A")
+            dates = info.get("dates", [])
+            num_cuts = len(dates)
+
+            class_report_text.insert(tk.END, f"Course Code: {class_name}\n")
+            class_report_text.insert(tk.END, f"Professor: {prof}\n")
+            class_report_text.insert(tk.END, f"Email: {email}\n")
+            class_report_text.insert(tk.END, f"Room: {room}\n")
+            class_report_text.insert(tk.END, f"Cut Limit: {limit}\n")
+            class_report_text.insert(tk.END, f"Empty Desks: {num_cuts}\n")
+
+            if dates:
+                class_report_text.insert(tk.END, "Empty Desks:\n")
+                for date in dates:
+                    class_report_text.insert(tk.END, f"  - {date}\n")
+            else:
+                class_report_text.insert(tk.END, "  - Full Desks\n")
+
+            class_report_text.insert(tk.END, "\n" + "-" * 40 + "\n\n")
+
+    class_report_text.config(state="disabled")
+
+    return
 
 
 # ----- Buttons -----
@@ -196,8 +236,10 @@ add_absent_button.grid(row=1, column=1)
 show_absents_button = tk.Button(root, text="Show Empty Desks", command=show_absents, pady=10)
 show_absents_button.grid(row=2, column=1)
 
-show_report_button = tk.Button(root, text = "All Empty Desks", command=show_all_absents, pady=10)
-show_report_button.grid(row=3, column=1)
+# show_report_button = tk.Button(root, text = "All Empty Desks", command=show_all_absents, pady=10)
+# show_report_button.grid(row=3, column=1)
+show_class_button = tk.Button(root, text = "Class Details", command=show_class_details, pady=10)
+show_class_button.grid(row=3, column=1)
 
 add_class_button = tk.Button(root, text = "Add New Course", command=add_course_window)
 add_class_button.grid(row=4, column=1)
